@@ -1,0 +1,33 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <main id="data-container"></main>
+  </body>
+  <script>
+    async function fetchBatchData() {
+      const response = await fetch("/stream-response");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      let done = false;
+      while (!done) {
+        const { value, done } = await reader.read();
+        const chunk = decoder.decode(value, { stream: true });
+        renderData(JSON.parse(chunk));
+      }
+    }
+
+    function renderData(data) {
+      const container = document.getElementById("data-container");
+      const item = document.createElement("div");
+      item.textContent = JSON.stringify(data);
+      container.appendChild(item);
+    }
+
+    fetchBatchData();
+  </script>
+</html>
